@@ -65,15 +65,92 @@ def line_func(list_of_coordinates):
     return set(final_list)
 
 
-# TestCase: 1
-print(line_func([[1, 1], [1, 2], [2, 2], [1, 3], [3, 3], [1, 4], [1, 5], [2, 6], [3, 9], [5, 8], [7, 3], [2, 4], [4, 5],
-                 [6, 6]]))
+def slope(x1, y1, x2, y2):
+    if x2 == x1:
+        return None
+    m = (y2 - y1) / (x2 - x1)
+    return m
+
+
+print(line_func(
+    [[1, 1], [1, 2], [2, 2], [1, 3], [3, 3], [1, 4], [1, 5], [2, 6], [3, 9], [5, 8], [7, 3], [2, 4],
+     [4, 5],
+     [6, 6]]))
 
 # TestCase: 2
 print(line_func([[2, 6], [3, 9], [5, 8], [7, 3], [2, 4], [4, 5], [6, 6]]))
 
 # TestCase: 3
 print(line_func(
-    [[0, 0], [11, 222], [21, 2], [11, 3], [32, 32], [11, 44], [122, 533], [2, 6], [3, 9], [5, 8], [7, 3], [2, 4],
+    [[0, 0], [11, 222], [21, 2], [11, 3], [32, 32], [11, 44], [122, 533], [2, 6], [3, 9], [5, 8],
+     [7, 3], [2, 4],
+     [4, 5],
+     [6, 6]]))
+
+
+def line_slope_and_intercept(l1, l2):
+    if l2[0] - l1[0] != 0:
+        m = (l2[1] - l1[1]) / (l2[0] - l1[0])
+        c = (l2[1] - (m * l2[0]))
+
+        return (m, c)
+
+
+"""
+
+The function 'solution_fast' takes in a list of coordinates of two dimensional space and returns a list of 
+equations of lines which passes through three or more points from the given coordinates.
+
+This function has a time complexity of O(n^2).
+
+For any given point, I am trying to calculate the slope with all the other points and I am storing in a HashMap with the
+slope as a key and the list of points as it's value. Now if the value of a HashMap has more than one value, it means 
+that three points are collinear. This can be extended to find any number of collinear points.
+
+"""
+
+
+def solution_fast(list_of_coordinates):
+    final_list_of_equations = set()
+    for i in list_of_coordinates:
+        temp_list = []
+        hash_map = {}
+        for j in list_of_coordinates:
+
+            if i != j:
+
+                if slope(i[0], i[1], j[0], j[1]) not in hash_map:
+                    hash_map[slope(i[0], i[1], j[0], j[1])] = [j]
+                else:
+                    temp = hash_map[slope(i[0], i[1], j[0], j[1])]
+                    temp.append(j)
+                    hash_map[slope(i[0], i[1], j[0], j[1])] = temp
+
+                temp_list.append(slope(i[0], i[1], j[0], j[1]))
+        # print(temp_list)
+        # print(hash_map)
+
+        # iterating over the HashMap
+
+        for key, value in hash_map.items():
+            if len(value) > 1:
+                a = value[0]
+                b = value[1]
+                final_list_of_equations.add(line_slope_and_intercept(a, b))
+    return final_list_of_equations
+
+
+print(solution_fast(
+    [[1, 1], [1, 2], [2, 2], [1, 3], [3, 3], [1, 4], [1, 5], [2, 6], [3, 9], [5, 8], [7, 3], [2, 4],
+     [4, 5],
+     [6, 6]]))
+
+# TestCase: 2
+print(solution_fast([[2, 6], [3, 9], [5, 8], [7, 3], [2, 4], [4, 5], [6, 6]]))
+
+# TestCase: 3
+print(solution_fast(
+    [[0, 0], [11, 222], [21, 2], [11, 3], [32, 32], [11, 44], [122, 533], [2, 6], [3, 9], [5, 8],
+     [7, 3], [2, 4],
      [4, 5],
      [6, 6]]))
